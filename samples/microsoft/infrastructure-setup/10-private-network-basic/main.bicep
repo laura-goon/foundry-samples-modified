@@ -93,7 +93,7 @@ resource delayScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
     account
   ]
   properties: {
-    azPowerShellVersion: 'latest'
+    azPowerShellVersion: '5.0'
     scriptContent: '''
       Start-Sleep -Seconds 60
     '''
