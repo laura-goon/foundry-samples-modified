@@ -84,6 +84,25 @@ resource subnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' = {
 Step 3: Create a private endpoint to access your private resource
 */
 
+
+resource delayScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+  name: 'delayBeforePrivateEndpoint'
+  location: location
+  dependsOn: [
+    account
+  ]
+  properties: {
+    azPowerShellVersion: 'latest'
+    scriptContent: '''
+      Start-Sleep -Seconds 60
+    '''
+    timeout: 'PT5M'
+    cleanupPreference: 'Always'
+    retentionInterval: 'P1D'
+  }
+}
+
+
 // Private endpoint for AI Services account
 // - Creates network interface in customer hub subnet
 // - Establishes private connection to AI Services account
@@ -107,7 +126,7 @@ resource aiAccountPrivateEndpoint 'Microsoft.Network/privateEndpoints@2024-05-01
     ]
   }
   dependsOn: [
-    account
+    delayScript
   ]
 }
 
