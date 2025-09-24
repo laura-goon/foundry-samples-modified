@@ -88,6 +88,7 @@ Step 3: Create a private endpoint to access your private resource
 resource delayScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   name: 'delayBeforePrivateEndpoint'
   location: location
+  kind: 'AzurePowerShell'
   dependsOn: [
     account
   ]
