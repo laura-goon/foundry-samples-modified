@@ -88,6 +88,7 @@ Step 3: Create a private endpoint to access your private resource
 // - Creates network interface in customer hub subnet
 // - Establishes private connection to AI Services account
 resource aiAccountPrivateEndpoint 'Microsoft.Network/privateEndpoints@2024-05-01' = {
+  parent: account
   name: '${aiFoundryName}-private-endpoint'
   location: resourceGroup().location
   properties: {
