@@ -228,7 +228,7 @@ resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-
   name: 'gpt-4o-mini'
   sku : {
     capacity: 1
-    name: 'DataZoneStandard'
+    name: 'GlobalStandard'
   }
   properties: {
     model:{
