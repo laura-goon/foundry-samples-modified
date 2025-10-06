@@ -30,6 +30,8 @@ Standard Setup Network Secured Steps for main.bicep
   'polandcentral'
   'switzerlandnorth'
   'norwayeast'
+  'usgovarizona'
+  'usgovvirginia'
 ])
 param location string = 'eastus2'
 
@@ -44,7 +46,7 @@ param modelFormat string = 'OpenAI'
 @description('The version of your model')
 param modelVersion string = '2024-11-20'
 @description('The sku of your model deployment')
-param modelSkuName string = 'GlobalStandard'
+param modelSkuName string = 'Standard'
 @description('The tokens per minute (TPM) of your model deployment')
 param modelCapacity int = 30
 
@@ -97,24 +99,9 @@ param azureCosmosDBAccountResourceId string = ''
 //param existingDnsZonesResourceGroup string = ''
 
 @description('Object mapping DNS zone names to their resource group, or empty string to indicate creation')
-param existingDnsZones object = {
-  'privatelink.services.ai.azure.com': ''
-  'privatelink.openai.azure.com': ''
-  'privatelink.cognitiveservices.azure.com': ''               
-  'privatelink.search.windows.net': ''           
-  'privatelink.blob.core.windows.net': ''                            
-  'privatelink.documents.azure.com': ''                       
-}
-
+param existingDnsZones object = {"privatelink.openai.azure.us":"","privatelink.cognitiveservices.azure.us":"","privatelink.search.azure.us":"","privatelink.blob.core.usgovcloudapi.net":"","privatelink.documents.azure.us":""}
 @description('Zone Names for Validation of existing Private Dns Zones')
-param dnsZoneNames array = [
-  'privatelink.services.ai.azure.com'
-  'privatelink.openai.azure.com'
-  'privatelink.cognitiveservices.azure.com'
-  'privatelink.search.windows.net'
-  'privatelink.blob.core.windows.net'
-  'privatelink.documents.azure.com'
-]
+param dnsZoneNames array = ["privatelink.openai.azure.us","privatelink.cognitiveservices.azure.us","privatelink.search.azure.us","privatelink.blob.core.usgovcloudapi.net","privatelink.documents.azure.us"]
 
 
 var projectName = toLower('${firstProjectName}${uniqueSuffix}')
