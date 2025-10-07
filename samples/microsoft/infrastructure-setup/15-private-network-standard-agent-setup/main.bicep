@@ -99,9 +99,9 @@ param azureCosmosDBAccountResourceId string = ''
 //param existingDnsZonesResourceGroup string = ''
 
 @description('Object mapping DNS zone names to their resource group, or empty string to indicate creation')
-param existingDnsZones object = {"privatelink.openai.azure.us":"","privatelink.cognitiveservices.azure.us":"","privatelink.search.azure.us":"","privatelink.blob.core.usgovcloudapi.net":"","privatelink.documents.azure.us":""}
+param existingDnsZones object = {'privatelink.openai.azure.us':'','privatelink.cognitiveservices.azure.us':'','privatelink.search.azure.us':'','privatelink.blob.core.usgovcloudapi.net':'','privatelink.documents.azure.us':''}
 @description('Zone Names for Validation of existing Private Dns Zones')
-param dnsZoneNames array = ["privatelink.openai.azure.us","privatelink.cognitiveservices.azure.us","privatelink.search.azure.us","privatelink.blob.core.usgovcloudapi.net","privatelink.documents.azure.us"]
+param dnsZoneNames array = ['privatelink.openai.azure.us','privatelink.cognitiveservices.azure.us','privatelink.search.azure.us','privatelink.blob.core.usgovcloudapi.net','privatelink.documents.azure.us']
 
 
 var projectName = toLower('${firstProjectName}${uniqueSuffix}')
