@@ -94,7 +94,7 @@ resource delayScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   properties: {
     azPowerShellVersion: '5.0'
     scriptContent: '''
-      Start-Sleep -Seconds 60
+      Start-Sleep -Seconds 120
     '''
     timeout: 'PT5M'
     cleanupPreference: 'Always'
