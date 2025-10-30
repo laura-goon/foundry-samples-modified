@@ -94,7 +94,7 @@ resource delayScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   properties: {
     azPowerShellVersion: '5.0'
     scriptContent: '''
-      Start-Sleep -Seconds 120
+      Start-Sleep -Seconds 60
     '''
     timeout: 'PT5M'
     cleanupPreference: 'Always'
@@ -124,6 +124,9 @@ resource aiAccountPrivateEndpoint 'Microsoft.Network/privateEndpoints@2024-05-01
       }
     ]
   }
+  dependsOn: [
+    delayScript
+  ]
 }
 
 /* 
