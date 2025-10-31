@@ -145,6 +145,10 @@ resource aiSearchPrivateEndpoint 'Microsoft.Network/privateEndpoints@2024-05-01'
       }
     ]
   }
+  dependsOn: [
+    aiSearch  // Explicit dependency on AI Search
+    peSubnet  // Explicit dependency on subnet
+  ]
 }
 
 /* -------------------------------------------- Storage Private Endpoint -------------------------------------------- */
