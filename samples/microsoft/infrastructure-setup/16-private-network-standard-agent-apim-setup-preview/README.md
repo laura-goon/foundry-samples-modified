@@ -88,8 +88,23 @@ This implementation gives you full control over the inbound and outbound communi
   - You must ensure the subnet is exclusively delegated to __Microsoft.App/environments__ and cannot be used by any other Azure resources.
   
 
-  **Limitations:**
-  - The capability host sub-resources of Resource/Project must be deleted before deleting the Resource/Project resource itself. You can use the script __deleteCaphost.sh__ located in this folder to delete it.  
+### Account Deletion Prerequisites and Cleanup Guidance
+
+Before deleting an **Account** resource, it is essential to first delete the associated **Account Capability Host**.  
+Failure to do so may result in residual dependencies—such as subnets and other provisioned resources (e.g., ACA applications)—remaining linked to the capability host.  
+This can lead to errors such as **"Subnet already in use"** when attempting to reuse the same subnet in a different account deployment.
+
+**Cleanup Options**
+
+**1. Full Account Removal**:
+You may delete and purge the account.  
+The service will automatically handle the deletion of the associated capability host and any linked resources in the background.
+
+**2. Retain Account, Remove Capability Host**:
+If you intend to retain the account but remove the capability host, you can use the script `deleteCaphost.sh` located in this folder.
+
+> **Important**: Before deleting the account capability host, ensure that the **project capability host** is deleted.
+
 
 
 ### Template Customization
