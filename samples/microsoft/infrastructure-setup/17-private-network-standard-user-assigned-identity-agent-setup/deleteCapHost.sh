@@ -56,8 +56,8 @@ echo -e "\nCapability host deletion request initiated."
 echo "Monitoring operation: ${operation_url}"
 
 # Poll the operation URL until the operation completes
-status="Creating"
-while [ "${status}" = "Creating" ]; do
+status="Deleting"
+while [ "${status}" = "Deleting" ]; do
     echo "Checking operation status..."
     access_token=$(az account get-access-token --query accessToken -o tsv)
     # Get the operation status
@@ -84,7 +84,7 @@ while [ "${status}" = "Creating" ]; do
 
     echo "Current status: ${status}"
 
-    if [ "${status}" = "Creating" ]; then
+    if [ "${status}" = "Deleting" ]; then
         echo "Operation still in progress. Waiting 10 seconds before checking again..."
         sleep 10
     fi

@@ -88,21 +88,16 @@ This implementation gives you full control over the inbound and outbound communi
 
 ### Account Deletion Prerequisites and Cleanup Guidance
 
-Before deleting an **Account** resource, it is essential to first delete the associated **Account Capability Host**.  
-Failure to do so may result in residual dependencies—such as subnets and other provisioned resources (e.g., ACA applications)—remaining linked to the capability host.  
-This can lead to errors such as **"Subnet already in use"** when attempting to reuse the same subnet in a different account deployment.
+Before deleting an **Account** resource, it is essential to first delete the associated **Account Capability Host**. Failure to do so may result in residual dependencies—such as subnets and other provisioned resources (e.g., ACA applications)—remaining linked to the capability host. This can lead to errors such as **"Subnet already in use"** when attempting to reuse the same subnet in a different account deployment.
 
 **Cleanup Options**
 
-**1. Full Account Removal**:
-You may delete and purge the account.  
-The service will automatically handle the deletion of the associated capability host and any linked resources in the background.
+**1. Full Account Removal**: To completely remove an account, you must delete and purge the account. Simply deleting the account is not sufficient, you must purge so that deletion of the associated capability host is triggered. The service will automatically handle the removal of the capability host and any linked resources in the background. To purge the account, use the following [link](https://learn.microsoft.com/en-us/azure/ai-services/recover-purge-resources?tabs=azure-portal#purge-a-deleted-resource). Please allow approximately max of 20 minutes for all resources to be fully unlinked from the account.
+ 
+**2. Retain Account, Remove Capability Host**: If you intend to retain the account but remove the capability host, execute the script `deleteCaphost.sh` located in this folder. After deletion, allow approximately max of 20 minutes for all resources to be fully unlinked from the account. To recreate the capability host for the account, use the script `createCaphost.sh` located in the same folder.
 
-**2. Retain Account, Remove Capability Host**:
-If you intend to retain the account but remove the capability host, you can use the script `deleteCaphost.sh` located in this folder.
 
 > **Important**: Before deleting the account capability host, ensure that the **project capability host** is deleted.
-
 
 ### Template Customization
 
