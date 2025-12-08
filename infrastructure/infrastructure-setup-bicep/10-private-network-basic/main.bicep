@@ -48,6 +48,24 @@ resource account 'Microsoft.CognitiveServices/accounts@2025-04-01-preview' = {
   }
 }
 
+resource delayScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+  name: 'delayBeforePrivateEndpoint'
+  location: location
+  kind: 'AzurePowerShell'
+  dependsOn: [
+    account
+  ]
+  properties: {
+    azPowerShellVersion: '5.0'
+    scriptContent: '''
+      Start-Sleep -Seconds 60
+    '''
+    timeout: 'PT5M'
+    cleanupPreference: 'Always'
+    retentionInterval: 'P1D'
+  }
+}
+
 /* 
 Step 2: Create a virtual network and private endpoint to access your private resource
 */
@@ -70,6 +88,9 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-05-01' = {
       }
     ]
   }
+  dependsOn: [
+    delayScript
+  ]
 }
 
 resource subnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' = {
