@@ -40,6 +40,7 @@ resource account 'Microsoft.CognitiveServices/accounts@2025-04-01-preview' = {
   }
 }
 
+/*
 #disable-next-line BCP081
 resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2025-04-01-preview'=  {
   parent: account
@@ -56,6 +57,7 @@ resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2025-
     }
   }
 }
+*/
 
 output accountName string = account.name
 output accountID string = account.id
