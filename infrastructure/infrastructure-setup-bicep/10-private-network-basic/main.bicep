@@ -11,8 +11,6 @@ param aiFoundryName string = 'foundrypnadisabled'
 @description('Location for all resources.')
 param location string = 'eastus'
 
-param modelLocation string = '${location}'
-
 @description('Name of the first project')
 param defaultProjectName string = '${aiFoundryName}-proj'
 
@@ -27,7 +25,7 @@ param peSubnetName string = 'pe-subnet'
 */ 
 resource account 'Microsoft.CognitiveServices/accounts@2025-04-01-preview' = {
   name: aiFoundryName
-  location: modelLocation
+  location: location
   identity: {
     type: 'SystemAssigned'
   }
