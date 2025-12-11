@@ -114,6 +114,7 @@ resource project 'Microsoft.CognitiveServices/accounts/projects@2025-04-01-previ
   }
 }
 
+/*
 #disable-next-line BCP081
 resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01'= {
   parent: account
@@ -130,6 +131,7 @@ resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-
     }
   }
 }
+*/
 
 output accountName string = account.name
 output projectName string = project.name
