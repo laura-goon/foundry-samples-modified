@@ -26,6 +26,7 @@ Standard Setup Network Secured Steps for main.bicep
   'westus2'
   'northcentralus'
   'canadacentral'
+  'eastus2euap'
 
   //only class B and C
   'koreacentral'
