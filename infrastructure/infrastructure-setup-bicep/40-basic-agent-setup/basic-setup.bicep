@@ -13,7 +13,7 @@ param projectDescription string = 'some description'
 param projectDisplayName string = 'project_display_name'
 
 @description('The name of cross region AOAI')
-param aoaiName string = 'cross_aoai'
+param aoaiName string = 'crossaoai'
 
 param byoAoaiConnectionName string = 'aoaiConnection'
 
