@@ -25,6 +25,15 @@
     },
     "modelCapacity": {
       "value": 1
+    },
+    "crossLocation": {
+      "value": "westus"
+    },
+    "aoaiName": {
+      "value": "cross_aoai"
+    },
+    "byoAoaiConnectionName": {
+      "value": "aoaiConnection"
     }
   }
 }
