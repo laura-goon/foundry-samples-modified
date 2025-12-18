@@ -2,6 +2,14 @@
 
 This folder contains Azure Bicep templates for creating APIM (API Management) connections to Azure AI Foundry projects.
 
+> **⚠️ IMPORTANT**: Before running any deployment, follow the [Setup Guide](./apim-setup-guide-for-agents.md) guide to properly configure your APIM service and obtain all applicable parameters. Make sure to collect these parameters to avoid 404/deploymentNotFound errors during Agent API execution:
+> 1. **inferenceApiVersion** - The API version for chat completions calls if api-version is required
+> 2. **deploymentApiVersion** - The API version for deployment operations if using dynamic discovery and api-version is required. 
+> 3. **apiName** - The name of your API in APIM (e.g., "foundry", "openai")
+> 4. **deploymentInPath** - Whether deployment ID is in the URL path or in body as model field in chat completions API call.
+>
+> These parameters must match your actual APIM configuration to ensure successful deployments.
+
 ## Prerequisites
 
 1. **Azure CLI** installed and configured
@@ -10,63 +18,58 @@ This folder contains Azure Bicep templates for creating APIM (API Management) co
 
 ## How to Deploy
 
-### Basic APIM Connection
+### Static Models APIM Connection
 ```bash
-# 1. Edit parameters-basic.json with your resource IDs
-# 2. Deploy using the parameters file
+# 1. Edit samples/parameters-static-models.json with your resource IDs
+# 2. Deploy (API key automatically retrieved from APIM service)
 az deployment group create \
   --resource-group <your-resource-group> \
-  --template-file connection-apim-basic.bicep \
-  --parameters @parameters-basic.json
-```
-
-### Deployment API Version APIM Connection
-```bash
-# 1. Edit parameters-deployment-api.json with your resource IDs
-# 2. Deploy using the parameters file
-az deployment group create \
-  --resource-group <your-resource-group> \
-  --template-file connection-apim-deployment-api-version.bicep \
-  --parameters @parameters-deployment-api.json
+  --template-file connection-apim.bicep \
+  --parameters @samples/parameters-static-models.json
 ```
 
 ### Dynamic Discovery APIM Connection
 ```bash
-# 1. Edit parameters-dynamic.json with your resource IDs
-# 2. Deploy using the parameters file
+# 1. Follow the apim-setup-guide-for-agents.md to configure both list and get endpoints in APIM
+# 2. Edit samples/parameters-dynamic-discovery.json with your resource IDs
+# 3. Deploy (API key automatically retrieved from APIM service)
 az deployment group create \
   --resource-group <your-resource-group> \
-  --template-file connection-apim-dynamic-discovery.bicep \
-  --parameters @parameters-dynamic.json
+  --template-file connection-apim.bicep \
+  --parameters @samples/parameters-dynamic-discovery.json
 ```
 
-### Static Models APIM Connection
+### Custom Headers APIM Connection
 ```bash
-# 1. Edit parameters-static.json with your resource IDs
-# 2. Deploy using the parameters file
+# 1. Edit samples/parameters-custom-headers.json with your resource IDs
+# 2. Deploy (API key automatically retrieved from APIM service)
 az deployment group create \
   --resource-group <your-resource-group> \
-  --template-file connection-apim-static-models.bicep \
-  --parameters @parameters-static.json
+  --template-file connection-apim.bicep \
+  --parameters @samples/parameters-custom-headers.json
 ```
 
-### Comprehensive APIM Connection
+### Custom Auth APIM Connection
 ```bash
-# 1. Edit parameters-comprehensive.json with your resource IDs
-# 2. Set only the parameters you need (make others empty/default)
-# 3. Deploy using the parameters file
+# 1. Edit samples/parameters-custom-auth-config.json with your resource IDs
+# 2. Deploy (API key automatically retrieved from APIM service)
 az deployment group create \
   --resource-group <your-resource-group> \
-  --template-file connection-apim-comprehensive.bicep \
-  --parameters @parameters-comprehensive.json
+  --template-file connection-apim.bicep \
+  --parameters @samples/parameters-custom-auth-config.json
 ```
+
+## Validation Features
+
+The template includes built-in validation:
+- **Invalid Configuration**: Fails with "ERROR: Cannot configure both static models and dynamic discovery."
+- **Missing Configuration**: Fails with "ERROR: Must configure either static models (staticModels array) OR dynamic discovery (listModelsEndpoint, getModelEndpoint, deploymentProvider). Cannot have neither."
 
 ## Parameter Files
 
-- `parameters-basic.json`: For basic APIM connections with minimal configuration
-- `parameters-deployment-api.json`: For APIM connections with API versioning (includes inferenceAPIVersion and deploymentAPIVersion)
-- `parameters-dynamic.json`: For APIM connections with dynamic model discovery (includes OpenAI endpoint configurations)
-- `parameters-static.json`: For APIM connections with static model lists (includes customizable staticModels array)
-- `parameters-comprehensive.json`: For comprehensive APIM connections supporting all metadata options (set only parameters you need, leave others empty)
+- `samples/parameters-static-models.json`: For APIM connections with predefined static model lists
+- `samples/parameters-dynamic-discovery.json`: For APIM connections with dynamic model discovery (includes endpoint configurations)
+- `samples/parameters-custom-headers.json`: For APIM connections with custom request headers
+- `samples/parameters-custom-auth-config.json`: For APIM connections with custom authentication configuration
 
-Edit these files to update the resource IDs for your environment.
+Edit these files to update the resource IDs and configuration for your environment.

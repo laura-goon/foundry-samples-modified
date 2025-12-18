@@ -1,3 +1,4 @@
+// <imports>
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -6,6 +7,7 @@ import { ToolUtility, DoneEvent, ErrorEvent, ThreadMessage } from '@azure/ai-age
 import { AIProjectClient } from '@azure/ai-projects';
 import { config } from 'dotenv';
 config();
+// </imports>
 
 // Run Azure AI Foundry chat completion using the Azure OpenAI model
 await chatCompletion().catch(console.error);
