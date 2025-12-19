@@ -11,6 +11,12 @@ param aiFoundryName string = 'foundrypnadisabled'
 @description('Location for all resources.')
 param location string = 'eastus'
 
+@description('Loation for cross-region AOAI resource.')
+param crossRegionLocation string = 'westus'
+
+@description('Name of cross-region AOAI resource.')
+param crossRegionAoaiName string = '${aiFoundryName}-aoai'
+
 @description('Name of the first project')
 param defaultProjectName string = '${aiFoundryName}-proj'
 
@@ -19,6 +25,50 @@ param vnetName string = 'private-vnet'
 
 @description('Name of the private endpoint subnet')
 param peSubnetName string = 'pe-subnet'
+
+@description('Existing AOAI resource to connect to from the project')
+param byoAoaiConnectionName string = 'aoaiConnection'
+
+/*
+  Step 0: Create cross-region AOAI resource + model deployment 
+*/ 
+resource aoaiResource 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
+  name: crossRegionAoaiName
+  location: crossRegionLocation
+  sku: {
+    name: 'S0'
+  }
+  kind: 'OpenAI'
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties: {
+    customSubDomainName: crossRegionAoaiName
+    networkAcls: {
+      defaultAction: 'Allow'
+      virtualNetworkRules: []
+      ipRules: []
+    }
+    publicNetworkAccess: 'Enabled'
+    disableLocalAuth: false
+  }
+}
+
+resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
+  parent: aoaiResource
+  name: 'gpt-4o-mini'
+  sku : {
+    capacity: 1
+    name: 'GlobalStandard'
+  }
+  properties: {
+    model:{
+      name: 'gpt-4o-mini'
+      format: 'OpenAI'
+      version: '2024-07-18'
+    }
+  }
+}
 
 /*
   Step 1: Create an Account 
@@ -217,26 +267,6 @@ resource aiServicesDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGr
   ]
 }
 
-
-/*
-  Step 6: Deploy gpt-4o model
-*/
-resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01'= {
-  parent: account
-  name: 'gpt-4o-mini'
-  sku : {
-    capacity: 1
-    name: 'GlobalStandard'
-  }
-  properties: {
-    model:{
-      name: 'gpt-4o-mini'
-      format: 'OpenAI'
-      version: '2024-07-18'
-    }
-  }
-}
-
 /*
   Step 4: Create a Project
 */
@@ -248,7 +278,48 @@ resource project 'Microsoft.CognitiveServices/accounts/projects@2025-04-01-previ
     type: 'SystemAssigned'
   }
   properties: {}
+  resource byoAoaiConnection 'connections@2025-04-01-preview' = {
+    name: byoAoaiConnectionName
+    properties: {
+      category: 'AzureOpenAI'
+      target: aoaiResource.properties.endpoint
+      authType: 'AAD'
+      metadata: {
+        ApiType: 'Azure'
+        ResourceId: aoaiResource.id
+        location: aoaiResource.location
+      }
+    }
+  }
 }
+
+/*
+  Step 5: Create capability hosts
+*/
+// Set the account capability host
+resource accountCapabilityHost 'Microsoft.CognitiveServices/accounts/capabilityHosts@2025-04-01-preview' = {
+  name: '${aiFoundryName}-capHost'
+  parent: account
+  properties: {
+    capabilityHostKind: 'Agents'
+  }
+  dependsOn: [
+    project
+  ]
+}
+// Set the project capability host with the aiServicesConnections
+resource projectCapabilityHost 'Microsoft.CognitiveServices/accounts/projects/capabilityHosts@2025-04-01-preview' = {
+  name: '${defaultProjectName}-capHost'
+  parent: project
+  properties: {
+    capabilityHostKind: 'Agents'
+    aiServicesConnections: [byoAoaiConnectionName]
+  }
+  dependsOn: [
+    accountCapabilityHost
+  ]
+}
+
 
 output accountId string = account.id
 output accountName string = account.name
