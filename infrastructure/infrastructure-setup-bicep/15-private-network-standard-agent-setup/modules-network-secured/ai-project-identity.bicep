@@ -16,6 +16,11 @@ param azureStorageName string
 param azureStorageSubscriptionId string
 param azureStorageResourceGroupName string
 
+param byoAoaiConnectionName string = 'aoaiConnection'
+param byoAoaiResourceEndpoint string
+param byoAoaiResourceId string
+param byoAoaiResourceLocation string
+
 resource searchService 'Microsoft.Search/searchServices@2024-06-01-preview' existing = {
   name: aiSearchName
   scope: resourceGroup(aiSearchServiceSubscriptionId, aiSearchServiceResourceGroupName)
@@ -84,6 +89,21 @@ resource project 'Microsoft.CognitiveServices/accounts/projects@2025-04-01-previ
         ApiType: 'Azure'
         ResourceId: searchService.id
         location: searchService.location
+      }
+    }
+  }
+
+  // Create a project connection to the existing Azure OpenAI resource
+  resource byoAoaiConnection 'connections@2025-04-01-preview' = {
+    name: byoAoaiConnectionName
+    properties: {
+      category: 'AzureOpenAI'
+      target: byoAoaiResourceEndpoint
+      authType: 'AAD'
+      metadata: {
+        ApiType: 'Azure'
+        ResourceId: byoAoaiResourceId
+        location: byoAoaiResourceLocation
       }
     }
   }
