@@ -33,6 +33,9 @@
 @description('The Azure region where your AI Foundry resource and project will be created.')
 param location string = 'eastus'
 
+@description('Region for cross-region AOAI resource.')
+param crossRegionLocation string = 'westus'
+
 @maxLength(9)
 @description('The name of the Azure AI Foundry resource.')
 param aiServices string = 'foundy'
@@ -117,6 +120,22 @@ module validateExistingResources 'modules-standard/validate-existing-resources.b
   }
 }
 
+/*
+  Create the cross-region AOAI account + model deployment
+*/
+module crossRegionAOAI 'modules-standard/cross-region-aoai.bicep' = {
+  name: 'cross-region-aoai-${uniqueSuffix}-deployment'
+  params: {
+    crossRegionLocation: crossRegionLocation
+    uniqueSuffix: uniqueSuffix
+    modelName: modelName
+    modelFormat: modelFormat
+    modelVersion: modelVersion
+    modelSkuName: modelSkuName
+    modelCapacity: modelCapacity
+  }
+}
+
 // This module will create new agent dependent resources
 // A Cosmos DB account, an AI Search Service, and a Storage Account are created if they do not already exist
 module aiDependencies 'modules-standard/standard-dependent-resources.bicep' = {
@@ -183,6 +202,10 @@ module aiProject 'modules-standard/ai-project-identity.bicep' = {
     azureStorageSubscriptionId: aiDependencies.outputs.azureStorageSubscriptionId
     azureStorageResourceGroupName: aiDependencies.outputs.azureStorageResourceGroupName
 
+    byoAoaiResourceEndpoint: crossRegionAOAI.outputs.aoaiEndpoint
+    byoAoaiResourceId: crossRegionAOAI.outputs.aoaiResourceId
+    byoAoaiResourceLocation: crossRegionLocation
+    
     accountName: aiAccount.outputs.accountName
   }
 }

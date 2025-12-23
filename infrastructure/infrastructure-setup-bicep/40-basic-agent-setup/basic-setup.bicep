@@ -50,6 +50,12 @@ var accountName = toLower('${aiServicesName}${uniqueSuffix}')
 @description('The Azure region where your AI Foundry resource and project will be created.')
 param location string = 'westus'
 
+@description('Loation for cross-region AOAI resource.')
+param crossRegionLocation string = 'westus'
+
+@description('Name of cross-region AOAI resource.')
+var crossRegionAoaiName string = '${accountName}-aoai'
+
 @description('The name of the OpenAI model you want to deploy')
 param modelName string = 'gpt-4o'
 
@@ -63,7 +69,51 @@ param modelVersion string = '2024-11-20'
 param modelSkuName string = 'GlobalStandard'
 
 @description('The capacity of the model deployment in TPM.')
-param modelCapacity int = 30
+param modelCapacity int = 10
+
+@description('Existing AOAI resource to connect to from the project')
+param byoAoaiConnectionName string = 'aoaiConnection'
+
+/*
+  Step 0: Create cross-region AOAI resource + model deployment 
+*/ 
+resource aoaiResource 'Microsoft.CognitiveServices/accounts@2024-10-01' = {
+  name: crossRegionAoaiName
+  location: crossRegionLocation
+  sku: {
+    name: 'S0'
+  }
+  kind: 'OpenAI'
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties: {
+    customSubDomainName: crossRegionAoaiName
+    networkAcls: {
+      defaultAction: 'Allow'
+      virtualNetworkRules: []
+      ipRules: []
+    }
+    publicNetworkAccess: 'Enabled'
+    disableLocalAuth: false
+  }
+}
+
+resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01' = {
+  parent: aoaiResource
+  name: modelName
+  sku : {
+    capacity: modelCapacity
+    name: modelSkuName
+  }
+  properties: {
+    model:{
+      name: modelName
+      format: modelFormat
+      version: modelVersion
+    }
+  }
+}
 
 #disable-next-line BCP081
 resource account 'Microsoft.CognitiveServices/accounts@2025-04-01-preview' = {
@@ -113,23 +163,63 @@ resource project 'Microsoft.CognitiveServices/accounts/projects@2025-04-01-previ
     description: projectDescription
     displayName: projectDisplayName
   }
-}
-
-#disable-next-line BCP081
-resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01'= {
-  parent: account
-  name: modelName
-  sku : {
-    capacity: modelCapacity
-    name: modelSkuName
-  }
-  properties: {
-    model:{
-      name: modelName
-      format: modelFormat
-      version: modelVersion
+  resource byoAoaiConnection 'connections@2025-04-01-preview' = {
+    name: byoAoaiConnectionName
+    properties: {
+      category: 'AzureOpenAI'
+      target: aoaiResource.properties.endpoint
+      authType: 'AAD'
+      metadata: {
+        ApiType: 'Azure'
+        ResourceId: aoaiResource.id
+        location: aoaiResource.location
+      }
     }
   }
+}
+
+// #disable-next-line BCP081
+// resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01'= {
+//   parent: account
+//   name: modelName
+//   sku : {
+//     capacity: modelCapacity
+//     name: modelSkuName
+//   }
+//   properties: {
+//     model:{
+//       name: modelName
+//       format: modelFormat
+//       version: modelVersion
+//     }
+//   }
+// }
+
+/*
+  Step 5: Create capability hosts
+*/
+// Set the account capability host
+resource accountCapabilityHost 'Microsoft.CognitiveServices/accounts/capabilityHosts@2025-04-01-preview' = {
+  name: '${accountName}-capHost'
+  parent: account
+  properties: {
+    capabilityHostKind: 'Agents'
+  }
+  dependsOn: [
+    project
+  ]
+}
+// Set the project capability host with the aiServicesConnections
+resource projectCapabilityHost 'Microsoft.CognitiveServices/accounts/projects/capabilityHosts@2025-04-01-preview' = {
+  name: '${projectName}-capHost'
+  parent: project
+  properties: {
+    capabilityHostKind: 'Agents'
+    aiServicesConnections: [byoAoaiConnectionName]
+  }
+  dependsOn: [
+    accountCapabilityHost
+  ]
 }
 
 output accountName string = account.name
