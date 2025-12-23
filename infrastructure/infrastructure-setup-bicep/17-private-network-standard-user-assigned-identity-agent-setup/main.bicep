@@ -36,6 +36,9 @@ Standard Setup Network Secured Steps for main.bicep
 ])
 param location string = 'eastus2'
 
+@description('Region for cross-region AOAI resource.')
+param crossRegionLocation string = 'westus'
+
 @description('Name for your AI Services resource.')
 param aiServices string = 'aiservices'
 
@@ -187,6 +190,22 @@ module vnet 'modules-network-secured/network-agent-vnet.bicep' = {
 }
 
 /*
+  Create the cross-region AOAI account + model deployment
+*/
+module crossRegionAOAI 'modules-network-secured/cross-region-aoai.bicep' = {
+  name: 'cross-region-aoai-${uniqueSuffix}-deployment'
+  params: {
+    crossRegionLocation: crossRegionLocation
+    uniqueSuffix: uniqueSuffix
+    modelName: modelName
+    modelFormat: modelFormat
+    modelVersion: modelVersion
+    modelSkuName: modelSkuName
+    modelCapacity: modelCapacity
+  }
+}
+
+/*
   Create the AI Services account and gpt-4o model deployment
 */
 module aiAccount 'modules-network-secured/ai-account-identity.bicep' = {
@@ -315,6 +334,10 @@ module aiProject 'modules-network-secured/ai-project-identity.bicep' = {
     azureStorageName: aiDependencies.outputs.azureStorageName
     azureStorageSubscriptionId: aiDependencies.outputs.azureStorageSubscriptionId
     azureStorageResourceGroupName: aiDependencies.outputs.azureStorageResourceGroupName
+
+    byoAoaiResourceEndpoint: crossRegionAOAI.outputs.aoaiEndpoint
+    byoAoaiResourceId: crossRegionAOAI.outputs.aoaiResourceId
+    byoAoaiResourceLocation: crossRegionLocation
     // dependent resources
     accountName: aiAccount.outputs.accountName
 
