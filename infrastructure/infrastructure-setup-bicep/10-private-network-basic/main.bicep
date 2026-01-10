@@ -158,6 +158,9 @@ resource aiServicesLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2
     }
     registrationEnabled: false           // Don't auto-register VNet resources
   }
+  dependsOn: [
+    aiServicesPrivateDnsZone
+  ]
 }
 
 resource aiOpenAILink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = {
@@ -170,6 +173,9 @@ resource aiOpenAILink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@202
     }
     registrationEnabled: false           // Don't auto-register VNet resources
   }
+  dependsOn: [
+    openAiPrivateDnsZone
+  ]
 }
 
 resource cognitiveServicesLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = {
@@ -182,6 +188,9 @@ resource cognitiveServicesLink 'Microsoft.Network/privateDnsZones/virtualNetwork
     }
     registrationEnabled: false           // Don't auto-register VNet resources
   }
+  dependsOn: [
+    cognitiveServicesPrivateDnsZone
+  ]
 }
 
 // 3) DNS Zone Group for AI Services
