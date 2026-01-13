@@ -85,8 +85,6 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
         name: agentSubnetName
         properties: {
           addressPrefix: agentSubnetPrefix
-          privateEndpointNetworkPolicies: 'Disabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
           delegations: [
             {
               name: 'Microsoft.App/environments'
@@ -101,33 +99,31 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
         name: peSubnetName
         properties: {
           addressPrefix: peSubnetPrefix
-          privateEndpointNetworkPolicies: 'Disabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
         }
       }
     ]
   }
 }
 
+// Some regions doesn't support Standard Zone-Redundant storage, need to use Geo-redundant storage
+param noZRSRegions array = ['southindia', 'westus', 'northcentralus']
+param sku object = contains(noZRSRegions, location) ? { name: 'Standard_GRS' } : { name: 'Standard_ZRS' }
 // Create Storage Account
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: azureStorageName
   location: location
-  sku: {
-    name: 'Standard_LRS'
-  }
+  sku: sku
   kind: 'StorageV2'
   properties: {
-    accessTier: 'Hot'
     allowBlobPublicAccess: false
-    allowSharedKeyAccess: true
+    allowSharedKeyAccess: false
     minimumTlsVersion: 'TLS1_2'
     networkAcls: {
       bypass: 'AzureServices'
       defaultAction: 'Deny'
+      virtualNetworkRules: []
     }
     publicNetworkAccess: 'Disabled'
-    supportsHttpsTrafficOnly: true
   }
 }
 
@@ -136,15 +132,22 @@ resource aiSearch 'Microsoft.Search/searchServices@2023-11-01' = {
   name: aiSearchName
   location: location
   sku: {
-    name: 'basic'
+    name: 'standard'
   }
   properties: {
+    disableLocalAuth: false
+    authOptions: { aadOrApiKey: { aadAuthFailureMode: 'http401WithBearerChallenge'}}
+    encryptionWithCmk: {
+      enforcement: 'Unspecified'
+    }
     replicaCount: 1
     partitionCount: 1
     hostingMode: 'default'
     publicNetworkAccess: 'disabled'
+    semanticSearch: 'disabled'
     networkRuleSet: {
-      bypass: 'AzureServices'
+      bypass: 'None'
+      ipRules: []
     }
   }
   identity: {
@@ -153,15 +156,17 @@ resource aiSearch 'Microsoft.Search/searchServices@2023-11-01' = {
 }
 
 // Create Cosmos DB Account
+var canaryRegions = ['eastus2euap', 'centraluseuap']
+var cosmosDbRegion = contains(canaryRegions, location) ? 'westus' : location
 resource cosmosDB 'Microsoft.DocumentDB/databaseAccounts@2024-11-15' = {
   name: cosmosDBName
-  location: location
+  location: cosmosDbRegion
   kind: 'GlobalDocumentDB'
   properties: {
     databaseAccountOfferType: 'Standard'
     locations: [
       {
-        locationName: location
+        locationName: cosmosDbRegion
         failoverPriority: 0
         isZoneRedundant: false
       }
@@ -170,10 +175,10 @@ resource cosmosDB 'Microsoft.DocumentDB/databaseAccounts@2024-11-15' = {
       defaultConsistencyLevel: 'Session'
     }
     publicNetworkAccess: 'Disabled'
-    networkAclBypass: 'AzureServices'
-  }
-  identity: {
-    type: 'SystemAssigned'
+    disableLocalAuth: true
+    enableAutomaticFailover: false
+    enableMultipleWriteLocations: false
+    enableFreeTier: false
   }
 }
 
