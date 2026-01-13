@@ -34,6 +34,7 @@ Standard Setup Network Secured Steps for main.bicep
   'switzerlandnorth'
   'norwayeast'
   'southeastasia'
+  'spaincentral'
 ])
 param location string = 'eastus2'
 
