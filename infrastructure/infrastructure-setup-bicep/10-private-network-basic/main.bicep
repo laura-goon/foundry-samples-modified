@@ -20,6 +20,9 @@ param vnetName string = 'private-vnet'
 @description('Name of the private endpoint subnet')
 param peSubnetName string = 'pe-subnet'
 
+param modelName string = 'gpt-4o-mini'
+param modelVersion string = '2024-07-18'
+
 /*
   Step 1: Create an Account 
 */ 
@@ -232,16 +235,16 @@ resource aiServicesDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGr
 */
 resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01'= {
   parent: account
-  name: 'gpt-4o-mini'
+  name: modelName
   sku : {
     capacity: 1
     name: 'GlobalStandard'
   }
   properties: {
     model:{
-      name: 'gpt-4o-mini'
+      name: modelName
       format: 'OpenAI'
-      version: '2024-07-18'
+      version: modelVersion
     }
   }
 }
