@@ -46,6 +46,7 @@ var accountName = toLower('${aiServicesName}${uniqueSuffix}')
   'northcentralus'
   'canadacentral'
   'eastus2euap'
+  'spaincentral'
 ])
 @description('The Azure region where your AI Foundry resource and project will be created.')
 param location string = 'westus'
