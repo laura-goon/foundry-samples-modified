@@ -22,6 +22,7 @@ param peSubnetName string = 'pe-subnet'
 
 param modelName string = 'gpt-4o-mini'
 param modelVersion string = '2024-07-18'
+param modelSkuName string = 'GlobalStandard'
 
 /*
   Step 1: Create an Account 
@@ -238,7 +239,7 @@ resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-
   name: modelName
   sku : {
     capacity: 1
-    name: 'GlobalStandard'
+    name: modelSkuName
   }
   properties: {
     model:{
