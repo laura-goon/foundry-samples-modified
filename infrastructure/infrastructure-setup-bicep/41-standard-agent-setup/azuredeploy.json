@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.39.26.7824",
-      "templateHash": "7659596839548579132"
+      "templateHash": "17836798406056740836"
     }
   },
   "parameters": {
@@ -73,7 +73,7 @@
     },
     "modelName": {
       "type": "string",
-      "defaultValue": "gpt-4o",
+      "defaultValue": "gpt-4.1",
       "metadata": {
         "description": "The name of the model you want to deploy"
       }
@@ -87,7 +87,7 @@
     },
     "modelVersion": {
       "type": "string",
-      "defaultValue": "2024-11-20",
+      "defaultValue": "2025-04-14",
       "metadata": {
         "description": "The version of your model"
       }
@@ -101,7 +101,7 @@
     },
     "modelCapacity": {
       "type": "int",
-      "defaultValue": 1,
+      "defaultValue": 40,
       "metadata": {
         "description": "The tokens per minute (TPM) of your model deployment"
       }

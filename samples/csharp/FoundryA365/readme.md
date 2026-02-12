@@ -6,13 +6,15 @@
 
 ## 📋 Prerequisites
 
-Before you begin, ensure you have the following installed and configured:
+**Note:** You must be enrolled in the [Frontier preview program](https://adoption.microsoft.com/en-us/copilot/frontier-program/) to publish a Foundry agent to Microsoft Agent 365.
+
+Ensure you have the following installed:
 
 | Requirement | Description |
 |------------|-------------|
 | [Azure Developer CLI](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd) | Infrastructure deployment tool |
-| [Docker](https://docker.com) | Container runtime |
 | [.NET 9.0 SDK](https://dotnet.microsoft.com/download) | Development framework |
+
 
 ### 🔐 Required Permissions
 
@@ -28,6 +30,8 @@ Before you begin, ensure you have the following installed and configured:
 
 Login to your Azure tenant and authenticate with Azure Developer CLI:
 
+Based on tenant security settings, sometimes just az login might be sufficient, sometimes one will need to login to each scope that is used in these scripts.
+
 ```powershell
 # Login to Azure CLI
 az login
@@ -36,24 +40,73 @@ az login --scope https://ai.azure.com/.default
 
 az login --scope https://graph.microsoft.com//.default
 
+az login --scope https://management.azure.com/.default
 # Login to Azure Developer CLI
 azd auth login
 ```
 
 ### Step 2: Deploy Everything
 
-Run the provisioning command to deploy Bicep resources, publish the digital worker, build the Docker image, and create the container agent:
+**Note:** Hosted agents are only available in the **North Central US** region. All resources must be created in this region.
+
+#### Optional: Customize Your Agent
+
+Before deploying, you can customize:
+- **Agent instructions:** [AgentInstructions.cs](./src/hello_world_a365_agent/AgentLogic/AgentInstructions.cs)
+- **MCP tools:** [ToolManifest.json](./src/hello_world_a365_agent/ToolingManifest.json) - [Learn more](https://learn.microsoft.com/en-us/microsoft-agent-365/tooling-servers-overview)
+
+#### Deploy
+
+Ensure Docker is running, then execute:
 
 ```powershell
-azd provision --verbose
+azd provision
 ```
 
-### Step 3: Configure Teams Integration
+After deployment completes, retrieve your resource values:
 
-1. **Setup Agent Blueprint**: Configure your agent [here](https://dev.teams.microsoft.com/tools/agent-blueprint)
-   - Note: `BotId` is the same as `blueprintId`
+```powershell
+azd env get-values
+```
 
-2. **Access Teams Store**: Visit the [Teams Store](https://teams.microsoft.com/v2/store/app:co:agentblueprints) in browser to create instances of the agent.
+> **📌 What to expect after deployment:**  
+> After `azd provision` completes successfully, you will see the **AgentIdentityBlueprint** in the Agents registry. You will **not** see any agents in the requests tab yet. This is expected behavior - you must first approve the agent blueprint, configure it in Teams Developer Portal, and then create agent instances based on that blueprint.
+
+### Step 3: Approve the Agent Blueprint
+
+**Important:** The first step is to approve the **agent blueprint** itself. Agent instances will be created later in Step 5.
+
+1. Navigate to the [Microsoft 365 admin center](https://admin.cloud.microsoft/?#/agents/all/requested)
+2. Under **Requests**, locate your **agent blueprint**:
+   ![Find your agent blueprint in A365](image.png)
+
+3. Click the **Approve request and activate** button to approve the blueprint:
+   ![Screenshot of the agent blueprint approval dialog with the 'Approve request and activate' button highlighted](image-1.png)
+
+### Step 4: Configure Teams Integration
+
+After approving the agent blueprint, configure it in the Teams Developer Portal:
+
+1. Open the [Teams Developer Portal](https://dev.teams.microsoft.com/tools/agent-blueprint) and locate your approved agent blueprint
+    
+   **Note:** Only 100 Agent Blueprints are displayed. If yours isn't visible, click any blueprint to open its details page, then in the browser's address bar replace the blueprint ID portion of the URL with your own Blueprint ID from the previous step (for example: `https://dev.teams.microsoft.com/tools/agent-blueprint/<your-blueprint-id>`).
+   ![Find agent blueprint](image-2.png)
+
+2. Get your Blueprint ID:
+   ```powershell
+   azd env get-values
+   ```
+
+3. Navigate to **Configuration** and add your **Bot ID** (same as Blueprint ID):
+   ![Screenshot showing the Bot ID configuration field in the Teams Developer Portal](image-3.png)
+
+### Step 5: Create Agent Instances
+
+After configuring the agent blueprint in Teams Developer Portal, you can now create agent instances based on your blueprint:
+
+1. In Microsoft Teams, navigate to **Apps** → **Agents for your team**
+2. Find your agent blueprint and create an instance:
+   ![Screenshot of Microsoft Teams showing the 'Agents for your team' section with an agent listed](image-4.png)
 
 ---
 
