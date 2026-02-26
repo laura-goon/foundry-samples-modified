@@ -29,7 +29,8 @@
   'northcentralus'
   'canadacentral'
   'eastus2euap'
-  'spaincentral'
+  'spaincentral
+  'centralus'
 ])
 @description('The Azure region where your AI Foundry resource and project will be created.')
 param location string = 'eastus'
