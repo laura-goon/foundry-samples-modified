@@ -234,6 +234,7 @@ resource aiServicesDnsGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGr
 /*
   Step 6: Deploy gpt-4o model
 */
+/*
 resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-10-01'= {
   parent: account
   name: modelName
@@ -249,6 +250,7 @@ resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2024-
     }
   }
 }
+*/
 
 /*
   Step 4: Create a Project
