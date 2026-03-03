@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.41.2.15936",
-      "templateHash": "17181203876487631611"
+      "templateHash": "11827451686864079554"
     }
   },
   "parameters": {
@@ -255,6 +255,25 @@
         "[resourceId('Microsoft.Network/privateDnsZones/virtualNetworkLinks', 'privatelink.cognitiveservices.azure.com', 'aiServicesCognitiveServices-link')]",
         "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.cognitiveservices.azure.com')]",
         "[resourceId('Microsoft.Network/privateDnsZones', 'privatelink.openai.azure.com')]"
+      ]
+    },
+    {
+      "type": "Microsoft.CognitiveServices/accounts/deployments",
+      "apiVersion": "2024-10-01",
+      "name": "[format('{0}/{1}', parameters('aiFoundryName'), parameters('modelName'))]",
+      "sku": {
+        "capacity": 1,
+        "name": "[parameters('modelSkuName')]"
+      },
+      "properties": {
+        "model": {
+          "name": "[parameters('modelName')]",
+          "format": "OpenAI",
+          "version": "[parameters('modelVersion')]"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.CognitiveServices/accounts', parameters('aiFoundryName'))]"
       ]
     },
     {
