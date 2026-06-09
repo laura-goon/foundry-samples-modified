@@ -76,7 +76,7 @@ param overloadedSearchRegion array = ['eastus2']
 param searchRegion string = contains(overloadedSearchRegion, location) ? 'eastus2' : location
 resource aiSearch 'Microsoft.Search/searchServices@2024-06-01-preview' = if(!aiSearchExists) {
   name: aiSearchName
-  location: overloadedSearchRegion
+  location: searchRegion
   identity: {
     type: 'SystemAssigned'
   }
