@@ -38,7 +38,7 @@ resource existingCosmosDB 'Microsoft.DocumentDB/databaseAccounts@2024-11-15' exi
 
 // CosmosDB creation
 
-var canaryRegions = ['eastus2euap', 'centraluseuap']
+var canaryRegions = ['eastus2euap', 'centraluseuap', 'westeurope']
 var cosmosDbRegion = contains(canaryRegions, location) ? 'westus' : location
 resource cosmosDB 'Microsoft.DocumentDB/databaseAccounts@2024-11-15' = if(!cosmosDBExists) {
   name: cosmosDBName
