@@ -36,13 +36,7 @@
         "germanywestcentral",
         "italynorth",
         "southafricanorth",
-        "southcentralus",
-        "westus2",
-        "northcentralus",
-        "canadacentral",
-        "eastus2euap",
-        "spaincentral",
-        "centralus"
+        "southcentralus"
       ],
       "metadata": {
         "description": "The Azure region where your AI Foundry resource and project will be created."
@@ -380,9 +374,7 @@
               "type": "array",
               "defaultValue": [
                 "southindia",
-                "westus",
-                "northcentralus",
-                "canadaeast"
+                "westus"
               ]
             },
             "sku": {
@@ -418,7 +410,7 @@
                 "enableFreeTier": false,
                 "locations": [
                   {
-                    "locationName": "[variables('cosmosDbRegion')]",
+                    "locationName": "[parameters('location')]",
                     "failoverPriority": 0,
                     "isZoneRedundant": false
                   }
