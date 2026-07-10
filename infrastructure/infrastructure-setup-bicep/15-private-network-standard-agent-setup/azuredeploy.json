@@ -33,21 +33,10 @@
         "westus3",
         "uksouth",
         "southindia",
-        "westus2",
-        "northcentralus",
-        "eastus2euap",
-        "centralus",
-        "japanwest",
-        "switzerlandwest",
-        "ukwest",
-        "westcentralus",
-        "southeastasia",
         "koreacentral",
         "polandcentral",
         "switzerlandnorth",
-        "norwayeast",
-        "southeastasia",
-        "spaincentral"
+        "norwayeast"
       ],
       "metadata": {
         "description": "Location for all resources."
@@ -1503,8 +1492,7 @@
             "cosmosParts": "[split(parameters('cosmosDBResourceId'), '/')]",
             "canaryRegions": [
               "eastus2euap",
-              "centraluseuap",
-              "westeurope"
+              "centraluseuap"
             ],
             "cosmosDbRegion": "[if(contains(variables('canaryRegions'), parameters('location')), 'westus', parameters('location'))]",
             "acsParts": "[split(parameters('aiSearchResourceId'), '/')]",
@@ -1529,7 +1517,7 @@
                 "enableFreeTier": false,
                 "locations": [
                   {
-                    "locationName": "[variables('cosmosDbRegion')]",
+                    "locationName": "[parameters('location')]",
                     "failoverPriority": 0,
                     "isZoneRedundant": false
                   }
@@ -1542,7 +1530,7 @@
               "type": "Microsoft.Search/searchServices",
               "apiVersion": "2024-06-01-preview",
               "name": "[parameters('aiSearchName')]",
-              "location": "[parameters('searchRegion')]",
+              "location": "[parameters('location')]",
               "identity": {
                 "type": "SystemAssigned"
               },
