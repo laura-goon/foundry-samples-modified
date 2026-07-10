@@ -38,7 +38,7 @@ resource existingCosmosDB 'Microsoft.DocumentDB/databaseAccounts@2024-11-15' exi
 
 // CosmosDB creation
 
-var canaryRegions = ['eastus2euap', 'centraluseuap']
+var canaryRegions = ['eastus2euap', 'centraluseuap', 'westeurope']
 var cosmosDbRegion = contains(canaryRegions, location) ? 'westus' : location
 resource cosmosDB 'Microsoft.DocumentDB/databaseAccounts@2024-11-15' = if(!cosmosDBExists) {
   name: cosmosDBName
@@ -55,7 +55,7 @@ resource cosmosDB 'Microsoft.DocumentDB/databaseAccounts@2024-11-15' = if(!cosmo
     enableFreeTier: false
     locations: [
       {
-        locationName: location
+        locationName: cosmosDbRegion
         failoverPriority: 0
         isZoneRedundant: false
       }
@@ -73,9 +73,11 @@ resource existingSearchService 'Microsoft.Search/searchServices@2024-06-01-previ
 
 // AI Search creation
 
+param overloadedSearchRegion array = ['eastus2']
+param searchRegion string = contains(overloadedSearchRegion, location) ? 'eastus' : location
 resource aiSearch 'Microsoft.Search/searchServices@2024-06-01-preview' = if(!aiSearchExists) {
   name: aiSearchName
-  location: location
+  location: searchRegion
   identity: {
     type: 'SystemAssigned'
   }
@@ -108,7 +110,7 @@ resource existingAzureStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-
 }
 
 // Some regions doesn't support Standard Zone-Redundant storage, need to use Geo-redundant storage
-param noZRSRegions array = ['southindia', 'westus']
+param noZRSRegions array = ['southindia', 'westus', 'northcentralus', 'canadaeast', 'switzerlandwest', 'westcentralus']
 param sku object = contains(noZRSRegions, location) ? { name: 'Standard_GRS' } : { name: 'Standard_ZRS' }
 
 // Storage creation
