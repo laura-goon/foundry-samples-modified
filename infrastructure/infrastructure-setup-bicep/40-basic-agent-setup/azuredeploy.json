@@ -69,13 +69,7 @@
         "germanywestcentral",
         "italynorth",
         "southafricanorth",
-        "southcentralus",
-        "westus2",
-        "northcentralus",
-        "canadacentral",
-        "eastus2euap",
-        "spaincentral",
-        "centralus"
+        "southcentralus"
       ],
       "metadata": {
         "description": "The Azure region where your AI Foundry resource and project will be created."
