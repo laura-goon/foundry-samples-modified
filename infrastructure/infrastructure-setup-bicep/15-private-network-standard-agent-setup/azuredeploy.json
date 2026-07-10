@@ -28,15 +28,26 @@
         "australiaeast",
         "swedencentral",
         "canadaeast",
-        "canadacentral",
+	      "canadacentral",
         "westeurope",
         "westus3",
         "uksouth",
         "southindia",
+        "westus2",
+        "northcentralus",
+        "eastus2euap",
+        "centralus",
+        "japanwest",
+        "switzerlandwest",
+        "ukwest",
+        "westcentralus",
+        "southeastasia",
         "koreacentral",
         "polandcentral",
         "switzerlandnorth",
-        "norwayeast"
+        "norwayeast",
+        "southeastasia",
+        "spaincentral"
       ],
       "metadata": {
         "description": "Location for all resources."
@@ -1242,6 +1253,27 @@
               "type": "bool",
               "value": "[and(variables('cosmosPassedIn'), equals(last(split(parameters('azureCosmosDBAccountResourceId'), '/')), variables('cosmosParts')[8]))]"
             },
+            "overloadedSearchRegion": {
+              "type": "array",
+              "defaultValue": [
+                "eastus2"
+              ]
+            },
+            "searchRegion": {
+              "type": "string",
+              "defaultValue": "[if(contains(parameters('overloadedSearchRegion'), parameters('location')), 'eastus', parameters('location'))]"
+            },
+            "noZRSRegions": {
+              "type": "array",
+              "defaultValue": [
+                "southindia",
+                "westus",
+                "northcentralus",
+                "canadaeast",
+                "switzerlandwest",
+                "westcentralus"
+              ]
+            },
             "azureStorageExists": {
               "type": "bool",
               "value": "[and(variables('storagePassedIn'), equals(last(split(parameters('azureStorageAccountResourceId'), '/')), variables('storageParts')[8]))]"
@@ -1466,7 +1498,8 @@
             "cosmosParts": "[split(parameters('cosmosDBResourceId'), '/')]",
             "canaryRegions": [
               "eastus2euap",
-              "centraluseuap"
+              "centraluseuap",
+              "westeurope"
             ],
             "cosmosDbRegion": "[if(contains(variables('canaryRegions'), parameters('location')), 'westus', parameters('location'))]",
             "acsParts": "[split(parameters('aiSearchResourceId'), '/')]",
@@ -1491,7 +1524,7 @@
                 "enableFreeTier": false,
                 "locations": [
                   {
-                    "locationName": "[parameters('location')]",
+                    "locationName": "[variables('cosmosDbRegion')]",
                     "failoverPriority": 0,
                     "isZoneRedundant": false
                   }
@@ -1504,7 +1537,7 @@
               "type": "Microsoft.Search/searchServices",
               "apiVersion": "2024-06-01-preview",
               "name": "[parameters('aiSearchName')]",
-              "location": "[parameters('location')]",
+              "location": "[parameters('searchRegion')]",
               "identity": {
                 "type": "SystemAssigned"
               },
