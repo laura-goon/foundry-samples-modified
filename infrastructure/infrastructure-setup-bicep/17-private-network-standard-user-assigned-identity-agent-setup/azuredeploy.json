@@ -32,10 +32,6 @@
         "westus3",
         "uksouth",
         "southindia",
-        "westus2",
-        "northcentralus",
-        "canadacentral",
-        "eastus2euap",
         "koreacentral",
         "polandcentral",
         "switzerlandnorth",
@@ -1411,8 +1407,7 @@
               "type": "array",
               "defaultValue": [
                 "southindia",
-                "westus",
-                "northcentralus"
+                "westus"
               ]
             },
             "sku": {
@@ -1449,7 +1444,7 @@
                 "enableFreeTier": false,
                 "locations": [
                   {
-                    "locationName": "[variables('cosmosDbRegion')]",
+                    "locationName": "[parameters('location')]",
                     "failoverPriority": 0,
                     "isZoneRedundant": false
                   }
