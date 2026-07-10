@@ -24,12 +24,23 @@ Standard Setup Network Secured Steps for main.bicep
   'westus3'
   'uksouth'
   'southindia'
+  'westus2'
+  'northcentralus'
+  'eastus2euap'
+  'centralus'
+  'japanwest'
+  'switzerlandwest'
+  'ukwest'
+  'westcentralus'
+  'southeastasia'
 
   //only class B and C
   'koreacentral'
   'polandcentral'
   'switzerlandnorth'
   'norwayeast'
+  'southeastasia'
+  'spaincentral'
 ])
 param location string = 'eastus'
 
