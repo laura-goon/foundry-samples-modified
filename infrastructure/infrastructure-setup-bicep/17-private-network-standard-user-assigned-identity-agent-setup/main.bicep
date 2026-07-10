@@ -23,6 +23,10 @@ Standard Setup Network Secured Steps for main.bicep
   'westus3'
   'uksouth'
   'southindia'
+  'westus2'
+  'northcentralus'
+  'canadacentral'
+  'eastus2euap'
 
   //only class B and C
   'koreacentral'
