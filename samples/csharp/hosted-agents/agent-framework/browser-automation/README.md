@@ -53,7 +53,8 @@ See [Program.cs](src/browser-automation-csharp-maf-sample-foundry/Program.cs) fo
 ## Prerequisites
 
 - An Azure AI Foundry project with a deployed chat model (e.g., `gpt-4.1`).
-- An Azure Playwright workspace and access token. If you do not have a workspace, follow [Create a workspace](https://learn.microsoft.com/azure/app-testing/playwright-workspaces/quickstart-run-end-to-end-tests?tabs=playwrightcli&pivots=playwright-test-runner#create-a-workspace).
+- An Azure Playwright workspace. If you do not have a workspace, follow [Create a workspace](https://learn.microsoft.com/azure/app-testing/playwright-workspaces/quickstart-run-end-to-end-tests?tabs=playwrightcli&pivots=playwright-test-runner#create-a-workspace).
+- The Foundry project's managed identity must have the **Playwright Workspace Contributor** role on the Azure Playwright workspace (see [RBAC setup](#rbac-setup) below).
 - Azure CLI installed and authenticated (`az login`).
 - Docker, if you want to build the container locally.
 - .NET 10 SDK for local development.
@@ -95,7 +96,7 @@ The Toolbox endpoint is resolved as `<FOUNDRY_PROJECT_ENDPOINT>/toolboxes/<TOOLB
 
 ### Provisioning parameters
 
-`PLAYWRIGHT_SERVICE_URL`, `PLAYWRIGHT_SERVICE_RESOURCE_ID`, and `PLAYWRIGHT_SERVICE_ACCESS_TOKEN` are not read by the C# agent at runtime. They are `azd` provisioning inputs used by [`azure.yaml`](azure.yaml) to create a `PlaywrightWorkspace` project connection with API key authentication and the default `browser-automation-tools` toolbox wired to that connection. `PLAYWRIGHT_SERVICE_ACCESS_TOKEN` is marked as a secret parameter in the manifest.
+`PLAYWRIGHT_SERVICE_URL` and `PLAYWRIGHT_SERVICE_RESOURCE_ID` are not read by the C# agent at runtime. They are `azd` provisioning inputs used by [`azure.yaml`](azure.yaml) to create a `PlaywrightWorkspace` project connection with **ProjectManagedIdentity** authentication and the default `browser-automation-tools` toolbox wired to that connection.
 
 Set these values with `azd env set` before running `azd provision`. `azd` stores them in `.azure/<environment-name>/.env`; the sample's root `.env` file is only for local execution.
 
@@ -136,7 +137,6 @@ If you don't already have a Foundry project and model deployment, provision them
 ```bash
 azd env set PLAYWRIGHT_SERVICE_URL "wss://<region>.api.playwright.microsoft.com/playwrightworkspaces/<workspace-id>/browsers"
 azd env set PLAYWRIGHT_SERVICE_RESOURCE_ID "/subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.LoadTestService/playwrightWorkspaces/<workspace-name>"
-azd env set PLAYWRIGHT_SERVICE_ACCESS_TOKEN "<playwright-workspace-access-token>"
 azd provision
 ```
 
@@ -241,6 +241,24 @@ Complete the toolbox setup in [Provision Azure resources](#provision-azure-resou
 3. On the **Basics** tab, choose deployment method (**Code** or **Container**) and confirm the agent name.
 4. On **Review + Deploy**, confirm runtime details, pick **CPU and Memory** size, and click **Deploy**.
 5. After deployment, invoke the agent in the Agent Playground and stream live logs from the **Logs** tab.
+
+## RBAC setup
+
+The Foundry project's managed identity must have the following role on the Azure Playwright workspace:
+
+| Role | Purpose |
+| --- | --- |
+| **Playwright Workspace Contributor** | Grants access to create and manage browser sessions |
+
+Assign the role using the Azure CLI:
+
+```bash
+# Get your project's managed identity principal ID from the Foundry portal or Azure CLI
+PRINCIPAL_ID="<project-managed-identity-object-id>"
+PWW_RESOURCE_ID="/subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.LoadTestService/playwrightWorkspaces/<workspace-name>"
+
+az role assignment create --assignee "$PRINCIPAL_ID" --role "Playwright Workspace Contributor" --scope "$PWW_RESOURCE_ID"
+```
 
 ## Customize the sample
 
